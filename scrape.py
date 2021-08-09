@@ -36,15 +36,14 @@ class Scrappy:
         #                                some invalid domains, but, since it's unlikely that real
         #                                webpages will contain invalid domains, the regex has been
         #                                kept simple and light.
-        email_regex = r"[0-9A-Za-z_.+-]+@[0-9A-Za-z]+\.[cominrgetdugvlwk]{2,4}"
+        email_regex = re.compile(r'[0-9A-Za-z_.+-]+@[0-9A-Za-z]+\.(?:com|in|gov|org|net|edu)')
 
         results = []
         for url in urls:
             response = self.get_url_response(url.replace("\\",""))
-            match = re.findall(email_regex, response)
-            print(f"emails found in {url}: {len(match)}    ")
+            match = email_regex.findall(response)
+            print(f"grepping emails in {url}                                                       ",end="\r")
             results.extend(match)
-        
         return results
     
     def use_threading(self, urls):
@@ -97,7 +96,7 @@ def main():
         emails.extend(scrape.get_sensitive_info(urls))
     else:
         emails.extend(scrape.use_threading(urls))
-
+    print("")
     if len(emails) < 1:
         sys.exit(f"No email addresses found")
 
